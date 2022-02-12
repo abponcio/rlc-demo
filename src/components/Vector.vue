@@ -23,7 +23,7 @@ export default {
   },
   methods: {
     applyClass() {
-      let classes = [...this.$el.classList];
+      let classes = [];
 
       if (this.svgClass) { classes = classes.concat(this.svgClass.split(' ')); }
 
@@ -39,3 +39,10 @@ export default {
 <template>
   <span v-html="src" v-bind="$attrs"/>
 </template>
+
+
+<style>
+span {
+  display: inline-block;
+}
+</style>

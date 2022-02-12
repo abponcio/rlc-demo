@@ -7,6 +7,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "animate.css": "^4.1.1",
+    "scrollmagic": "^2.0.8",
+    "swiper": "^8.0.5",
+    "velocity-animate": "1.2.0",
     "vue": "^3.2.25",
     "vue-router": "4"
   },
@@ -15,6 +19,7 @@
     "autoprefixer": "^10.4.2",
     "postcss": "^8.4.6",
     "sass": "^1.49.7",
+    "sass-loader": "^12.4.0",
     "tailwindcss": "^3.0.19",
     "vite": "^2.7.2"
   }
