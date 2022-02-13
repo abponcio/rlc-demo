@@ -10,6 +10,5 @@ import Vector from '@/components/Vector.vue';
 const app = createApp(App);
 
 app.use(router);
-app.use(Velocity);
 app.component('Vector', Vector);
 app.mount('#app');

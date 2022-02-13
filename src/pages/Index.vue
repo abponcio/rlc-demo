@@ -15,10 +15,46 @@ import Glow from '@/assets/svg/glow.svg?raw';
 import Quote from '@/assets/svg/quote.svg?raw';
 import RButton from '@/components/RButton.vue';
 
-import ScrollMagic from 'scrollmagic';
-import velocity from 'velocity-animate/velocity';
-import 'scrollmagic/scrollmagic/uncompressed/plugins/animation.velocity';
-import 'scrollmagic/scrollmagic/uncompressed/plugins/debug.addIndicators';
+// import ScrollMagic from 'scrollmagic';
+// // import gsap from 'gsap';
+// import 'scrollmagic/scrollmagic/uncompressed/plugins/debug.addIndicators';
+// import 'scrollmagic/scrollmagic/uncompressed/plugins/animation.gsap';
+import {gsap} from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
+
+function animateFrom(elem, direction) {
+  direction = direction || 1;
+  var x = 0,
+      y = direction * 100,
+      scale = 1;
+  if(elem.classList.contains("gs_reveal_fromLeft")) {
+    x = -100;
+    y = 0;
+  } else if (elem.classList.contains("gs_reveal_fromRight")) {
+    x = 100;
+    y = 0;
+  }
+  else {
+    x = 0;
+    y = 0;
+    scale = 0.5;
+  }
+  elem.style.transform = "translate(" + x + "px, " + y + "px)";
+  elem.style.opacity = "0";
+  gsap.fromTo(elem, {x: x, y: y, scale: scale, autoAlpha: 0}, {
+    duration: 1.25,
+    x: 0,
+    y: 0,
+    scale: 1,
+    autoAlpha: 1,
+    ease: "expo",
+    overwrite: "auto"
+  });
+}
+
+function hide(elem) {
+  gsap.set(elem, {autoAlpha: 0});
+}
 
 export default {
   name: 'Homepage',
@@ -39,73 +75,155 @@ export default {
     RButton,
   },
   methods: {
-    heroScene(controller) {
-      new ScrollMagic.Scene({
-        triggerElement: "#hero",
-        triggerHook: 0, // show, when scrolled 10% into view
-        duration: "80%", // hide 10% before exiting view (80% + 10% from bottom)
+    heroScene() {
+      gsap.fromTo(".hero-title", {xPercent: 100}, {
+        xPercent: -100,
+        ease: "none",
+        scrollTrigger: {
+          trigger: '#hero',
+          scrub: true,
+        },
       })
-      .setVelocity("#hero", {'background-color': '#ffffff'}, {duration: 400})
-      .addIndicators() // add indicators (requires plugin)
-      .addTo(controller);
+      gsap.fromTo(".stripes", {xPercent: -100}, {
+        xPercent: 100,
+        ease: "none",
+        scrollTrigger: {
+          trigger: '#hero',
+          scrub: true,
+        },
+      });
+    },
+    messageScene() {
+    },
+    presenceScene() {
+      gsap.to("#presence", {
+        'background-color': '#013878',
+        scrollTrigger: {
+          trigger: "#message",
+          start: 'top center',
+          scrub: true,
+        },
+      });
+
+      gsap.fromTo(".map-asia", {
+        x: -2,
+        y: -3,
+      }, {
+        x: 0,
+        y: 0,
+        duration: 2,
+        ease: 'power2.inOut',
+        yoyoEase: 'sine.out',
+        yoyo: true,
+        repeat: -1,
+      });
+
+      gsap.fromTo(".map-bg", {
+        x: -2,
+        y: -3,
+      }, {
+        x: 0,
+        y: 0,
+        duration: 2,
+        ease: 'power2.inOut',
+        yoyoEase: 'sine.out',
+        yoyo: true,
+        repeat: -1,
+      });
+
+      gsap.fromTo(".map-pin", {
+        x: -2,
+        y: -3,
+      }, {
+        x: 0,
+        y: 0,
+        duration: 2,
+        ease: 'power2.inOut',
+        yoyoEase: 'sine.out',
+        yoyo: true,
+        repeat: -1,
+      });
+
+      gsap.timeline()
+      .add(() => {
+        gsap.fromTo(".map-asia", {
+          x: 0,
+        }, {
+          x: -100,
+          scale: 2,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "#presence",
+            scrub: true,
+            pin: true,
+          },
+        });
+
+         gsap.fromTo(".map-bg", {left: 0, top: 0, scale: 1}, {
+          scale: 2,
+          top: 300,
+          left: -100,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "#presence",
+            scrub: true,
+            pin: true,
+            pinSpacing: false,
+          },
+        });
+
+        gsap.fromTo(".circle-map", {x: 0}, {
+          x: -100,
+          ease: "none",
+          scrollTrigger: {
+            trigger: "#presence",
+            scrub: true,
+          },
+        });
+
+        gsap.to(".map-pin", {
+          autoAlpha: 0,
+          ease: "none",
+        });
+      }, 'zoom-in')
+
+
     },
   },
   mounted() {
-    // init controller
-    const controller = new ScrollMagic.Controller();
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray(".gs_reveal").forEach(function(elem) {
+      hide(elem); // assure that the element is hidden when scrolled into view
 
-    this.heroScene(controller);
+      ScrollTrigger.create({
+        trigger: elem,
+        onEnter: function() { animateFrom(elem) },
+        onEnterBack: function() { animateFrom(elem, -1) },
+        onLeave: function() { hide(elem) } // assure that the element is hidden when scrolled into view
+      });
+    });
 
-    // // build scenes
-
-
-    // // build scenes
-    // new ScrollMagic.Scene({
-    //     triggerElement: "#message",
-    //     triggerHook: 0, // show, when scrolled 10% into view
-    //     duration: "160%", // hide 10% before exiting view (80% + 10% from bottom)
-    //     offset: -600 // move trigger to center of element
-    //   })
-    //   .setClassToggle("#message", "visible") // add class to reveal
-    //   .addIndicators() // add indicators (requires plugin)
-    //   .addTo(controller);
-
-    // const controller2 = new ScrollMagic.Controller({
-    // 	globalSceneOptions: {
-    // 		triggerHook: 'onLeave',
-    // 		duration: "100%" // this works just fine with duration 0 as well
-    // 	}
-    // });
-
-    // const slides = document.querySelectorAll("section");
-
-    // // create scene for every slide
-    // for (let i=0; i<slides.length; i++) {
-    // 	new ScrollMagic.Scene({
-    // 			triggerElement: slides[i]
-    // 		})
-    // 		.setPin(slides[i], {pushFollowers: false})
-    // 		// .addIndicators() // add indicators (requires plugin)
-    // 		.addTo(controller2);
-    // }
+    this.heroScene();
+    this.messageScene();
+    this.presenceScene();
   },
 }
 </script>
 <template>
   <section id="hero" class="bg-white">
     <div class="container flex z-10">
-      <div class="text-center">
+      <div class="text-center gs_reveal gs_reveal_fromLeft hero-title">
         <RLogo class="max-w-[41rem] mb-[1.8rem]"/>
         <h1 class="text-big font-bold leading-[9.4rem] uppercase">Annual Report</h1>
         <div class="text-jumbo text-rlc-cyan leading-none">2021</div>
       </div>
     </div>
-    <div class="absolute right-0 inset-y max-h-screen">
+    <div class="absolute right-0 inset-y max-h-screen gs_reveal gs_reveal_fromRight stripes">
       <img src="@/assets/hero-collage/images-collage.png" class="max-h-screen object-cover" alt="">
     </div>
   </section>
   <section id="message">
-    <div class="container max-w-[100rem] grid grid-cols-2 place-content-center gap-[6.2rem]">
+    <div class="container max-w-[100rem] grid grid-cols-2 place-content-center gap-[6.2rem] gs_reveal gs_reveal_fromLeft leader">
       <div>
         <div class="flex items-center justify-center gap-[6rem]">
           <div class="relative">
@@ -128,7 +246,7 @@ export default {
           </div>
         </div>
       </div>
-      <div class="text-center max-w-[50rem]">
+      <div class="text-center max-w-[50rem] gs_reveal gs_reveal_fromRight message">
         <h1 class="mb-[5.6rem] text-rlc-blue">Message to Shareholders</h1>
         <div class="py-[4rem] px-[6rem] border border-black rounded-[1rem] text-justify leading-[3.1rem] relative">
           <Vector :src="Quote" class="absolute bottom-[-2rem] right-[-2rem] w-[7.3rem] p-[1rem] bg-white"/>
@@ -147,16 +265,16 @@ export default {
       </div>
     </div>
   </section>
-  <section id="presence" class="bg-rlc-blue text-white">
-    <Vector :src="MapAsia" class="absolute inset-y-0 left-0" svg-class="h-screen w-screen"/>
+  <section id="presence" class="text-white">
+    <Vector :src="MapAsia" class="absolute inset-y-0 left-0 map-asia" svg-class="h-screen w-screen"/>
     <div class="container max-w-[110rem] grid grid-cols-2 place-items-center gap-[9.2rem]">
       <div class="relative">
         <Vector :src="PHMap" class="map-bg relative z-10" svg-class="w-[45rem] h-[67rem]"/>
-        <Vector :src="MapPin" class="z-20 absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]" svg-class="w-[6.5rem] h-[9.5rem]"/>
-        <Vector :src="CircleMap" class="z-10 absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]" />
+        <Vector :src="MapPin" class="map-pin z-20 absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]" svg-class="w-[6.5rem] h-[9.5rem]"/>
+        <Vector :src="CircleMap" class="z-10 circle-map absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]" />
         <Vector :src="Glow" class="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]" />
       </div>
-      <div>
+      <div class="presence-text gs_reveal">
         <h1 class="text-extra-big text-rlc-cyan leading-[10rem] uppercase text-bold">GROWING PRESENCE</h1>
         <p class="text-[3.6rem] pb-[2rem]">From Ilocos to South Cotabato</p>
         <div class="border-t pt-[2rem] border-rlc-cyan text-justify">
@@ -482,18 +600,12 @@ export default {
 
   #hero {
     @apply text-white px-[2rem] place-self-start ;
-
-    background: linear-gradient(117.81deg, #41C4FF -25.81%, transparent 26.09%);
-    background-color: #021B64;
-    transition: all 1s ease-in-out;
-
-    &.visible {
-      background-color: #ffffff;
-    }
+    background: linear-gradient(117.81deg, #41C4FF -25.81%, #021B64 26.09%);
   }
 
   #message {
-    background: linear-gradient(121.77deg, #1656A3 -1.6%, transparent 36.35%);
+    background: linear-gradient(121.77deg, #1656A3 -1.6%, #ffffff 36.35%);
+    will-change: transform;
   }
 
   #financial {
